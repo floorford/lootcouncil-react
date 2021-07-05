@@ -1,0 +1,96 @@
+input {
+  border: none;
+  appearance: none;
+  background-color: white;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: inherit;
+  line-height: inherit;
+  width: 100%;
+}
+
+input:focus {
+  outline: none;
+}
+
+.wrapper .search {
+  justify-content: flex-start;
+}
+
+.search form {
+  margin: 0;
+}
+
+button {
+  color: white;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: #f040af;
+  box-shadow: none;
+  border: none;
+  border-radius: 5px;
+  margin: 0 1rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #7f506e;
+  cursor: not-allowed;
+}
+
+.search {
+  margin-bottom: 4rem;
+}
+
+.lc {
+  border-radius: 5px;
+  margin: 0.5rem;
+  width: 100%;
+}
+
+.lc .member {
+  margin: 0;
+  width: unset;
+  box-shadow: unset;
+}
+
+.lc i {
+  margin: 1rem;
+  cursor: pointer;
+}
+
+.float-right {
+  float: right;
+}
+
+.collapsible table {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.collapsible .player-info {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.collapsible h3 {
+  margin: 0;
+}
+
+.collapsible tbody td {
+  padding: 8px;
+}
+
+.collapsible tbody td p {
+  margin: 4px 0 4px 0;
+}
+
+.collapsible .flex {
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}

@@ -1,0 +1,64 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    background-color: #333;
+}
+
+nav a {
+    color: #f040af;
+}
+
+.link {
+    font-size: 16px;
+    padding: 14px 16px;
+    text-decoration: none;
+    padding: 39px 34px;
+}
+
+.subnav {
+    overflow: hidden;
+}
+
+.subnav .subnavbtn {
+    font-size: 16px;
+    border: none;
+    outline: none;
+    padding: 39px 34px;
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    color: #f040af;
+}
+
+nav a:hover:not(.flex),
+.subnav:hover .subnavbtn {
+    background-color: #272727;
+}
+
+.subnav-content {
+    display: none;
+    position: absolute;
+    background-color: #272727;
+    width: 100%;
+    left: 0;
+    z-index: 1;
+}
+
+.subnav-content a {
+    float: right;
+    color: white;
+    text-decoration: none;
+    padding: 14px 16px;
+    margin: 0 2rem;
+}
+
+.subnav-content a:hover {
+    background-color: #eee;
+    color: black;
+}
+
+.subnav:hover .subnav-content {
+    display: block;
+}
