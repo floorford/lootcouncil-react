@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/lootcouncil-react/static/css/main.ce6a0a91.chunk.css",
+    "main.js": "/lootcouncil-react/static/js/main.435fcba4.chunk.js",
+    "main.js.map": "/lootcouncil-react/static/js/main.435fcba4.chunk.js.map",
+    "runtime-main.js": "/lootcouncil-react/static/js/runtime-main.5248653d.js",
+    "runtime-main.js.map": "/lootcouncil-react/static/js/runtime-main.5248653d.js.map",
+    "static/js/2.b3199a4b.chunk.js": "/lootcouncil-react/static/js/2.b3199a4b.chunk.js",
+    "static/js/2.b3199a4b.chunk.js.map": "/lootcouncil-react/static/js/2.b3199a4b.chunk.js.map",
+    "static/js/3.71f4007f.chunk.js": "/lootcouncil-react/static/js/3.71f4007f.chunk.js",
+    "static/js/3.71f4007f.chunk.js.map": "/lootcouncil-react/static/js/3.71f4007f.chunk.js.map",
+    "index.html": "/lootcouncil-react/index.html",
+    "static/css/main.ce6a0a91.chunk.css.map": "/lootcouncil-react/static/css/main.ce6a0a91.chunk.css.map",
+    "static/js/2.b3199a4b.chunk.js.LICENSE.txt": "/lootcouncil-react/static/js/2.b3199a4b.chunk.js.LICENSE.txt",
+    "static/media/mo_logo.41a78959.png": "/lootcouncil-react/static/media/mo_logo.41a78959.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.5248653d.js",
+    "static/js/2.b3199a4b.chunk.js",
+    "static/css/main.ce6a0a91.chunk.css",
+    "static/js/main.435fcba4.chunk.js"
+  ]
+}
