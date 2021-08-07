@@ -1,31 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { RoleRankClass, Loot } from "../types";
+import { RoleRankClass, IState, Item } from "../types";
 import lcStore from "../store/lc";
-import axios from "../axios";
+import axios from "axios";
+import axiosAPI from "../axios";
 
 const Raids = () => {
-  const [{ raids }, setRaidsData] = useState(lcStore.initialState);
+  const [relevantItems, setRelevantItems] = useState<Item[]>([]);
 
   const location = useLocation();
   const [selectedFilter, setFilter] = useState<string>(
     location.pathname.replace(/[^0-9]+/, "")
   );
-  const [raidDetails, setRaidDetails] = useState([]);
-
   const raidID = selectedFilter;
 
-  useEffect(() => {
-    lcStore.init();
-    const sub = lcStore.subscribe(setRaidsData);
+  const storedState = sessionStorage.getItem("state");
+  const [{ members, items, raids }, setDataState] = useState<IState>(
+    storedState ? JSON.parse(storedState) : lcStore.initialState
+  );
 
+  useLayoutEffect(() => {
+    const storedState = sessionStorage.getItem("state");
+    setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
+  }, [setDataState]);
+
+  useEffect(() => {
     if (!raids.length) {
       axios
-        .get("")
-        .then((response) => {
-          lcStore.setRaids(response.data);
-          lcStore.setLoading(false);
-        })
+        .all([axiosAPI.get(`/tabs/raids`)])
+        .then(
+          axios.spread((raids) => {
+            lcStore.setRaids(raids.data);
+            lcStore.setLoading(false);
+            lcStore.setError("");
+          })
+        )
         .catch((ex) => {
           const err =
             ex.response.status === 404
@@ -35,31 +44,13 @@ const Raids = () => {
           lcStore.setLoading(false);
         });
     }
+  }, [raids, location.pathname]);
 
+  useEffect(() => {
     if (raidID) {
-      axios
-        .get(`/tabs/raids/id/${raidID}`)
-        .then((response) => {
-          axios
-            .get(`/tabs/items/raid_id/${raidID}`)
-            .then((response) => console.log(response));
-          setRaidDetails(response.data);
-          lcStore.setLoading(false);
-        })
-        .catch((ex) => {
-          const err =
-            ex.response.status === 404
-              ? "Resource not found"
-              : "An unexpected error has occurred";
-          lcStore.setError(err);
-          lcStore.setLoading(false);
-        });
+      setRelevantItems(items.filter((item) => item.raid_id === raidID));
     }
-
-    return function cleanup() {
-      sub.unsubscribe();
-    };
-  }, [selectedFilter, raidID, raids.length]);
+  }, [raidID, location.pathname]);
 
   return (
     <main className="wrapper">
@@ -84,7 +75,7 @@ const Raids = () => {
         </form>
       ) : null}
 
-      {raidDetails.length ? (
+      {relevantItems.length ? (
         <table>
           <thead>
             <tr>
@@ -93,12 +84,24 @@ const Raids = () => {
             </tr>
           </thead>
           <tbody>
-            {raidDetails.map((item: Loot) => {
+            {relevantItems.map((item) => {
+              const member = members.find(
+                (member) => member.id === item.member_id
+              );
               return (
                 <tr key={item.id}>
-                  <td>{item.item}</td>
                   <td>
-                    <Link to={`/member/${item.id}`}>{item.member}</Link>
+                    <a
+                      target="_blank"
+                      href={`https://tbc.wowhead.com/item=${item.item_id}`}
+                    >
+                      {item.title}
+                    </a>
+                  </td>
+                  <td>
+                    <Link to={`/members/id/${member?.id}`}>
+                      {member?.member}
+                    </Link>
                   </td>
                 </tr>
               );

@@ -19,7 +19,6 @@ const Overview = (): JSX.Element => {
   useEffect(() => {
     lcStore.init();
     const sub = lcStore.subscribe(setDataState);
-
     if (!members.length) {
       axios
         .all([
@@ -37,6 +36,7 @@ const Overview = (): JSX.Element => {
               classes: classes.data,
             });
             lcStore.setLoading(false);
+            lcStore.setError("");
           })
         )
         .catch((ex) => {

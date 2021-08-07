@@ -1,5 +1,6 @@
 import { useState, useLayoutEffect, useEffect } from "react";
 import axios from "axios";
+import Select from "react-select";
 
 import lcStore from "../store/lc";
 import { Attendance, IState } from "../types";
@@ -7,87 +8,90 @@ import MemberCard from "../components/Member";
 import Stats from "../components/Stats";
 import LootTable from "../components/LootTable";
 import "../css/lootcouncil.css";
+import axiosAPI from "../axios";
 
 const LootCouncil = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [data, setDataState] = useState<IState>(lcStore.initialState);
-  const [totalRaids, setTotal] = useState<number>(0);
-  const [attendance, setAttendance] = useState<Attendance>({
-    passed_spot: "0",
-    late: "0",
-    no_show: "0",
-  });
+  const storedState = sessionStorage.getItem("state");
+  const [{ members, lcPlayers, loading, error, raids }, setDataState] =
+    useState<IState>(
+      storedState ? JSON.parse(storedState) : lcStore.initialState
+    );
 
   useLayoutEffect(() => {
+    const storedState = sessionStorage.getItem("state");
+    setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
+  }, [setDataState]);
+
+  useEffect(() => {
     const sub = lcStore.subscribe(setDataState);
-    lcStore.init();
+    if (!members.length) {
+      axios
+        .all([
+          axiosAPI.get(""),
+          axiosAPI.get("/tabs/roles"),
+          axiosAPI.get("/tabs/ranks"),
+          axiosAPI.get("/tabs/classes"),
+        ])
+        .then(
+          axios.spread((members, roles, ranks, classes) => {
+            lcStore.setData({
+              members: members.data,
+              roles: roles.data,
+              ranks: ranks.data,
+              classes: classes.data,
+            });
+            lcStore.setLoading(false);
+            lcStore.setError("");
+          })
+        )
+        .catch((ex) => {
+          const err =
+            ex.response.status === 404
+              ? "Resource not found"
+              : "An unexpected error has occurred";
+          lcStore.setError(err);
+          lcStore.setLoading(false);
+        });
+    }
 
     return function cleanup() {
       sub.unsubscribe();
     };
-  }, [setDataState]);
+  }, [members.length]);
 
   useEffect(() => {
     const newPlayers = JSON.parse(localStorage.getItem("lcPlayers") || "[]");
     lcStore.setPlayers(newPlayers);
   }, []);
 
-  useEffect(() => {
-    if (totalRaids === 0) {
-      axios
-        .get(`/api/raids/total`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => {
-          setTotal(response.data.totalRaids);
-        })
-        .catch((ex) => {
-          const err =
-            ex.response.status === 404
-              ? "The total number of raids couldn't be found"
-              : "An unexpected error has occurred";
-          lcStore.setError(err);
-          lcStore.setLoading(false);
-        });
-    }
-  }, [totalRaids]);
-
   const submitSearch = (e: React.SyntheticEvent): void => {
     e.preventDefault();
 
-    axios
-      .get(`/api/addPlayer/${searchTerm}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        const newPlayers = data.lcPlayers.concat(response.data.player);
-        lcStore.setPlayers(newPlayers);
-        localStorage.setItem("lcPlayers", JSON.stringify(newPlayers));
-        lcStore.setLoading(false);
-        setSearchTerm("");
-      })
-      .catch((ex) => {
-        const err =
-          ex.response.status === 404
-            ? "No player could be found"
-            : "An unexpected error has occurred";
-        lcStore.setError(err);
-        lcStore.setLoading(false);
-      });
+    const chosenPlayer = members.find(
+      (member) =>
+        member.member.toLocaleLowerCase() === searchTerm.toLocaleLowerCase()
+    );
+
+    if (chosenPlayer !== undefined) {
+      const newPlayers = lcPlayers.concat(chosenPlayer);
+      lcStore.setPlayers(newPlayers);
+      localStorage.setItem("lcPlayers", JSON.stringify(newPlayers));
+      lcStore.setLoading(false);
+      setSearchTerm("");
+    } else {
+      lcStore.setError("No player could be found");
+      lcStore.setLoading(false);
+    }
   };
 
   const deletePlayer = (player: any) => {
-    const newPlayers = data.lcPlayers.filter(
-      (x: any) => x.player.id !== player.id
-    );
+    const newPlayers = lcPlayers.filter((x: any) => x.player.id !== player.id);
     lcStore.setPlayers(newPlayers);
     localStorage.setItem("lcPlayers", JSON.stringify(newPlayers));
   };
 
+  console.log(members);
   return (
     <main className="wrapper">
       <header className="pink">
@@ -95,6 +99,13 @@ const LootCouncil = () => {
         <h4>Add players using the search below to compare</h4>
       </header>
       <div className="flex search">
+        <Select
+          className="pink"
+          options={members}
+          isClearable
+          isSearchable
+          placeholder="Enter a player..."
+        />
         <form onSubmit={(e) => submitSearch(e)}>
           <label htmlFor="search">
             <input
@@ -116,12 +127,12 @@ const LootCouncil = () => {
         </button>
       </div>
 
-      {data.loading && <p className="pink">Loading...</p>}
-      {data.error && <p className="pink">{data.error}</p>}
+      {loading && <p className="pink">Loading...</p>}
+      {error && <p className="pink">{error}</p>}
 
       <section className="grid">
-        {data.lcPlayers.length
-          ? data.lcPlayers.map((x: any, i: number) => (
+        {lcPlayers.length
+          ? lcPlayers.map((x: any, i: number) => (
               <section key={i} className={`lc ${x.player.class}`}>
                 <div className="float-right">
                   <i
@@ -132,16 +143,17 @@ const LootCouncil = () => {
                 <MemberCard member={x.player} interactive={true} propClass="" />
 
                 <div className="collapsible">
-                  <Stats
+                  {/* <Stats
                     member={x.player}
-                    raidTotal={totalRaids}
+                    raidTotal={raids.length}
                     totalLoot={x.playerLoot}
                     attendance={attendance}
-                  />
+                  /> */}
                   <LootTable
-                    details={x.playerLoot}
+                    items={x.playerLoot}
                     maxHeight={350}
                     playerClass={x.player.class}
+                    raids={raids}
                   />
                 </div>
               </section>

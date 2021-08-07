@@ -1,9 +1,10 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
+import axiosAPI from "../axios";
 import lcStore from "../store/lc";
-import { IState, IData, RoleRankClass, Member } from "../types";
+import { IState, RoleRankClass, Member } from "../types";
 import { ucFirst } from "../helper";
 import MemberCard from "../components/Member";
 
@@ -11,24 +12,40 @@ import "../css/filter.css";
 
 const Filter = () => {
   const location = useLocation().pathname.slice(1);
-  const [data, setDataState] = useState<IState>(lcStore.initialState);
   const [selectedFilter, setFilter] = useState<string>("");
 
-  useEffect(() => {
-    lcStore.init();
-    const sub = lcStore.subscribe(setDataState);
+  const storedState = sessionStorage.getItem("state");
+  const [data, setDataState] = useState<IState>(
+    storedState ? JSON.parse(storedState) : lcStore.initialState
+  );
 
+  useLayoutEffect(() => {
+    const storedState = sessionStorage.getItem("state");
+    setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
+  }, [setDataState]);
+
+  useEffect(() => {
+    const sub = lcStore.subscribe(setDataState);
     if (!data.members.length) {
       axios
-        .get<IData>("/api/members", {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => {
-          lcStore.setData(response.data);
-          lcStore.setLoading(false);
-        })
+        .all([
+          axiosAPI.get(""),
+          axiosAPI.get("/tabs/roles"),
+          axiosAPI.get("/tabs/ranks"),
+          axiosAPI.get("/tabs/classes"),
+        ])
+        .then(
+          axios.spread((members, roles, ranks, classes) => {
+            lcStore.setData({
+              members: members.data,
+              roles: roles.data,
+              ranks: ranks.data,
+              classes: classes.data,
+            });
+            lcStore.setError("");
+            lcStore.setLoading(false);
+          })
+        )
         .catch((ex) => {
           const err =
             ex.response.status === 404

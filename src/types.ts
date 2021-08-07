@@ -27,45 +27,60 @@ export type RoleRankClass = {
   title: string;
 };
 
-export type Detail = {
-  item: string;
+export type Item = {
+  item_id: string;
   title: string;
   id: number;
+  member_id: string;
+  raid_id: string;
 };
 
 export type Attendance = {
-  no_show: string;
-  late: string;
-  passed_spot: string;
+  id: string;
+  event_id: string;
+  member_id: string;
+  raid_id: string;
 };
 
-export interface IState {
-  members: Array<Member>;
-  roles: Array<RoleRankClass>;
-  ranks: Array<RoleRankClass>;
-  classes: Array<RoleRankClass>;
-  raids: Array<RoleRankClass>;
+export type MappedAttendance = {
+  id: string;
+  event: string;
+  member_id: string;
+  raid_id: string;
+};
+
+export type IState = {
+  members: Member[];
+  roles: RoleRankClass[];
+  ranks: RoleRankClass[];
+  classes: RoleRankClass[];
+  raids: RoleRankClass[];
+  events: RoleRankClass[];
+  attendance: MappedAttendance[];
   selectedMember: Member;
   loading: boolean;
   error: string;
-  lcPlayers: [];
+  lcPlayers: Member[];
+  items: Item[];
   [key: string]: any;
-}
+};
 
-export interface IData {
+export type IData = {
   members: Array<MemberData>;
   roles: Array<RoleRankClass>;
   ranks: Array<RoleRankClass>;
   classes: Array<RoleRankClass>;
-}
-export interface IFormField {
+};
+
+export type IFormField = {
   title: string;
   fields: Array<IField>;
-}
-export interface IField {
+};
+
+export type IField = {
   label: string;
   id: string;
-}
+};
 
 export type MemberProps = {
   member: Member;
@@ -76,14 +91,15 @@ export type MemberProps = {
 export type StatsProps = {
   member: Member;
   raidTotal: number;
-  totalLoot: Array<Detail>;
-  attendance: Attendance;
+  totalLoot: Array<Item>;
+  attendance: MappedAttendance[];
 };
 
 export type LootTableProps = {
-  details: Array<Detail>;
+  items: Array<Item>;
   playerClass: string;
   maxHeight: number;
+  raids: RoleRankClass[];
 };
 
 export type Loot = {

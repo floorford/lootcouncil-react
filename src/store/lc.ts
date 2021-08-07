@@ -1,5 +1,14 @@
 import { Subject } from "rxjs";
-import { IState, Member, IData, RoleRankClass, MemberData } from "../types";
+import {
+  IState,
+  Member,
+  IData,
+  RoleRankClass,
+  MemberData,
+  Item,
+  Attendance,
+  MappedAttendance,
+} from "../types";
 
 // An RxJS Subject can act as both an Observable and an Observer at the same time
 // when a Subject receives any data, that data can be forwarded to every Observer subscribed to it
@@ -12,6 +21,8 @@ const initialState: IState = {
   classes: [],
   raids: [],
   events: [],
+  items: [],
+  attendance: [],
   selectedMember: {
     id: "",
     member: "",
@@ -79,18 +90,41 @@ const lcStore = {
     sessionStorage.setItem("state", JSON.stringify(state));
     subject.next(state);
   },
-  setEvents: (event: Array<RoleRankClass>) => {
+  setItems: (items: Item[]) => {
     state = {
       ...state,
-      events: event,
+      items,
     };
     sessionStorage.setItem("state", JSON.stringify(state));
     subject.next(state);
   },
-  setRaids: (raidInfo: Array<RoleRankClass>) => {
+  setEvents: (events: Array<RoleRankClass>, attendance: Array<Attendance>) => {
+    const mappedAttendance = attendance.reduce<MappedAttendance[]>(
+      (acc, { id, member_id, raid_id, event_id }) => {
+        const eventTitle = events.find((event) => event.id === event_id);
+        const newAttendance = {
+          id,
+          member_id,
+          raid_id,
+          event: eventTitle ? eventTitle.title : "",
+        };
+        acc.push(newAttendance);
+        return acc;
+      },
+      []
+    );
     state = {
       ...state,
-      raids: raidInfo,
+      attendance: mappedAttendance,
+      events,
+    };
+    sessionStorage.setItem("state", JSON.stringify(state));
+    subject.next(state);
+  },
+  setRaids: (raids: Array<RoleRankClass>) => {
+    state = {
+      ...state,
+      raids,
     };
     sessionStorage.setItem("state", JSON.stringify(state));
     subject.next(state);

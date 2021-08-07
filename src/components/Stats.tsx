@@ -1,17 +1,21 @@
-import { StatsProps, Detail } from "../types";
+import { StatsProps } from "../types";
 
 const Stats = ({ member, raidTotal, totalLoot, attendance }: StatsProps) => {
   const { absence, prev_raids, six_months } = member;
-  const { no_show, late, passed_spot } = attendance;
 
-  const lootNumber = totalLoot
-    .slice()
-    .reduce((acc: number, val: Detail): number => {
-      const itemSplit = val.item.split("/");
-      acc += itemSplit.length;
+  const { no_show, late, passed_spot } = attendance.reduce(
+    (acc, val) => {
+      console.log(val);
+      if (val.event === "No Show") acc.no_show += 1;
+      if (val.event === "Late") acc.late += 1;
+      if (val.event === "Passed Spot") acc.passed_spot += 1;
+
       return acc;
-    }, 0);
+    },
+    { no_show: 0, late: 0, passed_spot: 0 }
+  );
 
+  const lootNumber = totalLoot.length;
   return (
     <section className={`player-info ${member.class}`}>
       <h3 className="pink">Player Stats</h3>
@@ -23,7 +27,7 @@ const Stats = ({ member, raidTotal, totalLoot, attendance }: StatsProps) => {
         <div>
           <p>
             Attendance:{" "}
-            {Math.ceil(((raidTotal - Number(prev_raids)) / raidTotal) * 100)}%
+            {Math.ceil((Number(+prev_raids - no_show) / raidTotal) * 100)}%
           </p>
           <p>No shows: {no_show}</p>
           <p>Late: {late}</p>
