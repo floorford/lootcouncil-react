@@ -1,4 +1,4 @@
-import { LootTableProps, Item } from "../types";
+import { LootTableProps } from "../types";
 import { Link } from "react-router-dom";
 
 const LootTable = ({
@@ -14,6 +14,7 @@ const LootTable = ({
         <table>
           <thead>
             <tr>
+              <th>Date</th>
               <th>Raid</th>
               <th>Item</th>
             </tr>
@@ -24,16 +25,20 @@ const LootTable = ({
               return (
                 <tr key={item.id}>
                   {raid && (
-                    <td>
-                      <Link to={`/raids/${raid.id}`}>{raid.title}</Link>
-                    </td>
+                    <>
+                      <td>{raid.date}</td>
+                      <td>
+                        <Link to={`/raids/${raid.id}`}>{raid.title}</Link>
+                      </td>
+                    </>
                   )}
                   <td>
                     <a
                       target="_blank"
+                      rel="noreferrer"
                       href={`https://tbc.wowhead.com/item=${item.item_id}`}
                     >
-                      {item.title}
+                      {item.title} - {item.spec}
                     </a>
                   </td>
                 </tr>

@@ -9,10 +9,15 @@ import { ucFirst } from "../helper";
 import MemberCard from "../components/Member";
 
 import "../css/filter.css";
+import Select from "react-select";
 
 const Filter = () => {
   const location = useLocation().pathname.slice(1);
-  const [selectedFilter, setFilter] = useState<string>("");
+  const [selectedFilter, setFilter] = useState<string | undefined>("");
+
+  useEffect(() => {
+    setFilter("");
+  }, [location]);
 
   const storedState = sessionStorage.getItem("state");
   const [data, setDataState] = useState<IState>(
@@ -68,7 +73,10 @@ const Filter = () => {
     (mem: Member) => mem[locationNameReady] === selectedFilter
   );
 
-  let filter = data[location];
+  const filter = data[location].map((data: RoleRankClass) => {
+    return { ...data, value: data.title, label: ucFirst(data.title) };
+  });
+
   return (
     <main className="wrapper">
       <header>
@@ -76,22 +84,20 @@ const Filter = () => {
       </header>
 
       {filter.length ? (
-        <form>
-          <select
-            className="pink"
-            value={selectedFilter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="">
-              Please Select a {ucFirst(locationNameReady)}
-            </option>
-            {filter.map((cl: RoleRankClass) => (
-              <option key={cl.id} value={cl.title}>
-                {ucFirst(cl.title)}
-              </option>
-            ))}
-          </select>
-        </form>
+        <div className="flex search">
+          <Select
+            className="pink select"
+            value={filter.find(
+              (filter: { value: string | undefined }) =>
+                filter.value === selectedFilter
+            )}
+            options={filter}
+            isClearable
+            isSearchable
+            placeholder={`Please Select a ${ucFirst(locationNameReady)}`}
+            onChange={(selected) => setFilter(selected?.value)}
+          />
+        </div>
       ) : null}
 
       {filteredMembers.length ? (

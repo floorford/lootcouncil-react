@@ -4,7 +4,7 @@ import axios from "axios";
 import lcStore from "../store/lc";
 import axiosAPI from "../axios";
 
-import { IState, Attendance } from "../types";
+import { IState } from "../types";
 import MemberCard from "./Member";
 import LootTable from "./LootTable";
 import Stats from "./Stats";
@@ -81,7 +81,7 @@ const Player = (): JSX.Element => {
           lcStore.setError(err);
           lcStore.setLoading(false);
         });
-  }, [location.pathname]);
+  }, [location.pathname, raids, items, events]);
 
   const memberLoot = items.filter(
     (item) => item.member_id === selectedMember.id
@@ -90,6 +90,7 @@ const Player = (): JSX.Element => {
   const memberAttendance = attendance.filter(
     (att) => att.member_id === selectedMember.id
   );
+
   return (
     <main className="wrapper">
       <MemberCard

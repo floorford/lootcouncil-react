@@ -27,12 +27,19 @@ export type RoleRankClass = {
   title: string;
 };
 
+export type Raid = {
+  id: string;
+  title: string;
+  date: string;
+};
+
 export type Item = {
   item_id: string;
   title: string;
   id: number;
   member_id: string;
   raid_id: string;
+  spec: string;
 };
 
 export type Attendance = {
@@ -54,7 +61,7 @@ export type IState = {
   roles: RoleRankClass[];
   ranks: RoleRankClass[];
   classes: RoleRankClass[];
-  raids: RoleRankClass[];
+  raids: Raid[];
   events: RoleRankClass[];
   attendance: MappedAttendance[];
   selectedMember: Member;
@@ -99,7 +106,7 @@ export type LootTableProps = {
   items: Array<Item>;
   playerClass: string;
   maxHeight: number;
-  raids: RoleRankClass[];
+  raids: Raid[];
 };
 
 export type Loot = {

@@ -1,18 +1,20 @@
 import { useEffect, useLayoutEffect, useState } from "react";
-import { useLocation, Link } from "react-router-dom";
-import { RoleRankClass, IState, Item } from "../types";
+import { useLocation, Link, useHistory } from "react-router-dom";
+import { IState, Item, Member } from "../types";
 import lcStore from "../store/lc";
 import axios from "axios";
 import axiosAPI from "../axios";
+import Select from "react-select";
 
 const Raids = () => {
   const [relevantItems, setRelevantItems] = useState<Item[]>([]);
 
+  const history = useHistory();
+
   const location = useLocation();
-  const [selectedFilter, setFilter] = useState<string>(
+  const [raidID, setFilter] = useState<string | undefined>(
     location.pathname.replace(/[^0-9]+/, "")
   );
-  const raidID = selectedFilter;
 
   const storedState = sessionStorage.getItem("state");
   const [{ members, items, raids }, setDataState] = useState<IState>(
@@ -22,9 +24,12 @@ const Raids = () => {
   useLayoutEffect(() => {
     const storedState = sessionStorage.getItem("state");
     setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
-  }, [setDataState]);
+  }, [setDataState, storedState]);
 
   useEffect(() => {
+    lcStore.init();
+    const sub = lcStore.subscribe(setDataState);
+
     if (!raids.length) {
       axios
         .all([axiosAPI.get(`/tabs/raids`)])
@@ -44,13 +49,46 @@ const Raids = () => {
           lcStore.setLoading(false);
         });
     }
-  }, [raids, location.pathname]);
+
+    if (!items.length)
+      axios
+        .all([axiosAPI.get(`/tabs/items`)])
+        .then(
+          axios.spread((items) => {
+            lcStore.setItems(items.data);
+
+            lcStore.setLoading(false);
+          })
+        )
+        .catch((ex) => {
+          const err =
+            ex.response.status === 404
+              ? "Resource not found"
+              : "An unexpected error has occurred";
+          lcStore.setError(err);
+          lcStore.setLoading(false);
+        });
+
+    return function cleanup() {
+      sub.unsubscribe();
+    };
+  }, [raids, items]);
 
   useEffect(() => {
     if (raidID) {
+      console.log(items, raidID);
       setRelevantItems(items.filter((item) => item.raid_id === raidID));
     }
-  }, [raidID, location.pathname]);
+  }, [raidID, items]);
+
+  const raidOptions = raids.map((raid) => {
+    return { ...raid, value: raid.id, label: `${raid.title} (${raid.date})` };
+  });
+
+  const selectMember = (member: Member) => {
+    lcStore.setMember(member);
+    history.push(`/members/id/${member.id}`);
+  };
 
   return (
     <main className="wrapper">
@@ -59,20 +97,16 @@ const Raids = () => {
       </header>
 
       {raids.length ? (
-        <form>
-          <select
-            className="pink"
-            value={selectedFilter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="">Please Select a Raid</option>
-            {raids.map((cl: RoleRankClass) => (
-              <option key={cl.id} value={cl.id}>
-                {cl.title}
-              </option>
-            ))}
-          </select>
-        </form>
+        <div className="flex search">
+          <Select
+            className="pink select"
+            options={raidOptions}
+            isClearable
+            isSearchable
+            placeholder="Enter or select a raid..."
+            onChange={(selectedRaid) => setFilter(selectedRaid?.id)}
+          />
+        </div>
       ) : null}
 
       {relevantItems.length ? (
@@ -93,16 +127,22 @@ const Raids = () => {
                   <td>
                     <a
                       target="_blank"
+                      rel="noreferrer"
                       href={`https://tbc.wowhead.com/item=${item.item_id}`}
                     >
                       {item.title}
                     </a>
                   </td>
-                  <td>
-                    <Link to={`/members/id/${member?.id}`}>
-                      {member?.member}
-                    </Link>
-                  </td>
+                  {member && (
+                    <td>
+                      <Link
+                        onClick={() => selectMember(member)}
+                        to={`/members/id/${member?.id}`}
+                      >
+                        {member?.member}
+                      </Link>
+                    </td>
+                  )}
                 </tr>
               );
             })}

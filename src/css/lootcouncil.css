@@ -1,4 +1,4 @@
-input {
+.select {
   border: none;
   appearance: none;
   background-color: white;
@@ -6,36 +6,15 @@ input {
   font-size: inherit;
   cursor: inherit;
   line-height: inherit;
-  width: 100%;
+  width: 90%;
 }
 
-input:focus {
+.select:focus {
   outline: none;
 }
 
 .wrapper .search {
   justify-content: flex-start;
-}
-
-.search form {
-  margin: 0;
-}
-
-button {
-  color: white;
-  font-family: inherit;
-  font-size: inherit;
-  background-color: #f040af;
-  box-shadow: none;
-  border: none;
-  border-radius: 5px;
-  margin: 0 1rem;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #7f506e;
-  cursor: not-allowed;
 }
 
 .search {
@@ -70,7 +49,6 @@ button:disabled {
 
 .collapsible .player-info {
   padding-top: 0;
-  padding-bottom: 0;
 }
 
 .collapsible h3 {

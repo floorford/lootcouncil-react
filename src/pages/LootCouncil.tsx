@@ -3,20 +3,26 @@ import axios from "axios";
 import Select from "react-select";
 
 import lcStore from "../store/lc";
-import { Attendance, IState } from "../types";
+import { IState, Member } from "../types";
 import MemberCard from "../components/Member";
-import Stats from "../components/Stats";
 import LootTable from "../components/LootTable";
 import "../css/lootcouncil.css";
 import axiosAPI from "../axios";
+import Stats from "../components/Stats";
 
 const LootCouncil = () => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedPlayer, setSelectedPlayer] = useState<MemberLabel | null>();
   const storedState = sessionStorage.getItem("state");
-  const [{ members, lcPlayers, loading, error, raids }, setDataState] =
-    useState<IState>(
-      storedState ? JSON.parse(storedState) : lcStore.initialState
-    );
+  const [
+    { members, lcPlayers, loading, error, raids, items, attendance, events },
+    setDataState,
+  ] = useState<IState>(
+    storedState ? JSON.parse(storedState) : lcStore.initialState
+  );
+
+  const memberOptions = members.map((member) => {
+    return { ...member, value: member.id, label: member.member };
+  });
 
   useLayoutEffect(() => {
     const storedState = sessionStorage.getItem("state");
@@ -55,43 +61,91 @@ const LootCouncil = () => {
         });
     }
 
+    if (!raids.length)
+      axios
+        .all([axiosAPI.get(`/tabs/raids`)])
+        .then(
+          axios.spread((raids) => {
+            lcStore.setRaids(raids.data);
+            lcStore.setLoading(false);
+          })
+        )
+        .catch((ex) => {
+          const err =
+            ex.response.status === 404
+              ? "Resource not found"
+              : "An unexpected error has occurred";
+          lcStore.setError(err);
+          lcStore.setLoading(false);
+        });
+
+    if (!items.length)
+      axios
+        .all([axiosAPI.get(`/tabs/items`)])
+        .then(
+          axios.spread((items) => {
+            lcStore.setItems(items.data);
+
+            lcStore.setLoading(false);
+          })
+        )
+        .catch((ex) => {
+          const err =
+            ex.response.status === 404
+              ? "Resource not found"
+              : "An unexpected error has occurred";
+          lcStore.setError(err);
+          lcStore.setLoading(false);
+        });
+
+    if (!events.length)
+      axios
+        .all([axiosAPI.get(`/tabs/events`), axiosAPI.get(`/tabs/attendance`)])
+        .then(
+          axios.spread((events, attendance) => {
+            lcStore.setEvents(events.data, attendance.data);
+            lcStore.setLoading(false);
+          })
+        )
+        .catch((ex) => {
+          const err =
+            ex.response.status === 404
+              ? "Resource not found"
+              : "An unexpected error has occurred";
+          lcStore.setError(err);
+          lcStore.setLoading(false);
+        });
+
     return function cleanup() {
       sub.unsubscribe();
     };
-  }, [members.length]);
+  }, [members, raids, items, events]);
 
   useEffect(() => {
     const newPlayers = JSON.parse(localStorage.getItem("lcPlayers") || "[]");
     lcStore.setPlayers(newPlayers);
   }, []);
 
-  const submitSearch = (e: React.SyntheticEvent): void => {
-    e.preventDefault();
-
-    const chosenPlayer = members.find(
-      (member) =>
-        member.member.toLocaleLowerCase() === searchTerm.toLocaleLowerCase()
-    );
-
-    if (chosenPlayer !== undefined) {
+  type MemberLabel = Member & { value: string; label: string };
+  const addPlayer = (chosenPlayer: MemberLabel | null): void => {
+    if (chosenPlayer) {
       const newPlayers = lcPlayers.concat(chosenPlayer);
       lcStore.setPlayers(newPlayers);
       localStorage.setItem("lcPlayers", JSON.stringify(newPlayers));
       lcStore.setLoading(false);
-      setSearchTerm("");
+      setSelectedPlayer(null);
     } else {
       lcStore.setError("No player could be found");
       lcStore.setLoading(false);
     }
   };
 
-  const deletePlayer = (player: any) => {
-    const newPlayers = lcPlayers.filter((x: any) => x.player.id !== player.id);
+  const deletePlayer = (player: Member) => {
+    const newPlayers = lcPlayers.filter((x) => x.id !== player.id);
     lcStore.setPlayers(newPlayers);
     localStorage.setItem("lcPlayers", JSON.stringify(newPlayers));
   };
 
-  console.log(members);
   return (
     <main className="wrapper">
       <header className="pink">
@@ -100,64 +154,58 @@ const LootCouncil = () => {
       </header>
       <div className="flex search">
         <Select
-          className="pink"
-          options={members}
+          className="pink select"
+          options={memberOptions}
           isClearable
           isSearchable
+          value={
+            memberOptions.find(
+              (member) => member.value === selectedPlayer?.value
+            ) || []
+          }
           placeholder="Enter a player..."
+          onChange={(selectedPlayer) => addPlayer(selectedPlayer)}
         />
-        <form onSubmit={(e) => submitSearch(e)}>
-          <label htmlFor="search">
-            <input
-              type="search"
-              id="search"
-              className="pink"
-              value={searchTerm}
-              placeholder="Enter a player..."
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </label>
-        </form>
-        <button
-          disabled={!searchTerm.length ? true : false}
-          onClick={(e) => submitSearch(e)}
-          type="button"
-        >
-          Add
-        </button>
       </div>
-
       {loading && <p className="pink">Loading...</p>}
       {error && <p className="pink">{error}</p>}
 
       <section className="grid">
         {lcPlayers.length
-          ? lcPlayers.map((x: any, i: number) => (
-              <section key={i} className={`lc ${x.player.class}`}>
-                <div className="float-right">
-                  <i
-                    className="fas fa-lg fa-times"
-                    onClick={() => deletePlayer(x.player)}
-                  ></i>
-                </div>
-                <MemberCard member={x.player} interactive={true} propClass="" />
+          ? lcPlayers.map((member: Member, i: number) => {
+              const memberLoot = items.filter(
+                (item) => item.member_id === member.id
+              );
+              const memberAttendance = attendance.filter(
+                (att) => att.member_id === member.id
+              );
+              return (
+                <section key={i} className={`lc ${member.class}`}>
+                  <div className="float-right">
+                    <i
+                      className="fas fa-lg fa-times"
+                      onClick={() => deletePlayer(member)}
+                    ></i>
+                  </div>
+                  <MemberCard member={member} interactive={true} propClass="" />
 
-                <div className="collapsible">
-                  {/* <Stats
-                    member={x.player}
-                    raidTotal={raids.length}
-                    totalLoot={x.playerLoot}
-                    attendance={attendance}
-                  /> */}
-                  <LootTable
-                    items={x.playerLoot}
-                    maxHeight={350}
-                    playerClass={x.player.class}
-                    raids={raids}
-                  />
-                </div>
-              </section>
-            ))
+                  <div className="collapsible">
+                    <Stats
+                      member={member}
+                      raidTotal={raids.length}
+                      totalLoot={memberLoot}
+                      attendance={memberAttendance}
+                    />
+                    <LootTable
+                      items={memberLoot}
+                      maxHeight={350}
+                      playerClass={member.class}
+                      raids={raids}
+                    />
+                  </div>
+                </section>
+              );
+            })
           : null}
       </section>
     </main>

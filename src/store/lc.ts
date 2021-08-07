@@ -8,6 +8,7 @@ import {
   Item,
   Attendance,
   MappedAttendance,
+  Raid,
 } from "../types";
 
 // An RxJS Subject can act as both an Observable and an Observer at the same time
@@ -53,7 +54,7 @@ const lcStore = {
       const { class_id, role_id, rank_id, ...memberData } = val;
       const formattedData: Member = {
         ...memberData,
-        six_months: Boolean(memberData.six_months),
+        six_months: memberData.six_months,
         class: data.classes.find((cl) => cl.id === class_id)!.title,
         role: data.roles.find((r) => r.id === role_id)!.title,
         rank: data.ranks.find((ra) => ra.id === rank_id)!.title,
@@ -121,7 +122,7 @@ const lcStore = {
     sessionStorage.setItem("state", JSON.stringify(state));
     subject.next(state);
   },
-  setRaids: (raids: Array<RoleRankClass>) => {
+  setRaids: (raids: Array<Raid>) => {
     state = {
       ...state,
       raids,
