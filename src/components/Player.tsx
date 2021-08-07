@@ -1,5 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import lcStore from "../store/lc";
 import axiosAPI from "../axios";
@@ -13,23 +12,21 @@ import "../css/player.css";
 
 const Player = (): JSX.Element => {
   const storedState = sessionStorage.getItem("state");
-
   const [{ selectedMember, events, items, raids, attendance }, setDataState] =
     useState<IState>(
       storedState ? JSON.parse(storedState) : lcStore.initialState
     );
 
-  const location = useLocation();
-
-  useLayoutEffect(() => {
-    const storedState = sessionStorage.getItem("state");
+  useEffect(() => {
     setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
-  }, [setDataState]);
+  }, [setDataState, storedState]);
 
   useEffect(() => {
+    const sub = lcStore.subscribe(setDataState);
+    lcStore.init();
     if (!events.length)
       axios
-        .all([axiosAPI.get(`/tabs/events`), axiosAPI.get(`/tabs/attendance`)])
+        .all([axiosAPI.get(`/events`), axiosAPI.get(`/attendance`)])
         .then(
           axios.spread((events, attendance) => {
             lcStore.setEvents(events.data, attendance.data);
@@ -47,7 +44,7 @@ const Player = (): JSX.Element => {
 
     if (!raids.length)
       axios
-        .all([axiosAPI.get(`/tabs/raids`)])
+        .all([axiosAPI.get(`/raids`)])
         .then(
           axios.spread((raids) => {
             lcStore.setRaids(raids.data);
@@ -65,7 +62,7 @@ const Player = (): JSX.Element => {
 
     if (!items.length)
       axios
-        .all([axiosAPI.get(`/tabs/items`)])
+        .all([axiosAPI.get(`/items`)])
         .then(
           axios.spread((items) => {
             lcStore.setItems(items.data);
@@ -81,7 +78,11 @@ const Player = (): JSX.Element => {
           lcStore.setError(err);
           lcStore.setLoading(false);
         });
-  }, [location.pathname, raids, items, events]);
+
+    return function cleanup() {
+      sub.unsubscribe();
+    };
+  }, [events, items, raids]);
 
   const memberLoot = items.filter(
     (item) => item.member_id === selectedMember.id

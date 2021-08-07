@@ -29,7 +29,7 @@ const Member = ({
       <img
         className="class-icon"
         alt={member.class}
-        src={`/assets/${member.class.replace(/\s/g, "")}.png`}
+        src={`/lootcouncil-react/assets/${member.class.replace(/\s/g, "")}.png`}
       />
       <div className="member-wrapper">
         <header className="member-header">

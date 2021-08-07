@@ -20,15 +20,28 @@ const Stats = ({ member, raidTotal, totalLoot, attendance }: StatsProps) => {
       <h3 className="pink">Player Stats</h3>
       <section className="flex" style={{ justifyContent: "space-between" }}>
         <div>
-          <p>Missed Raids: {absence}</p>
-          <p>Total loot recieved: {lootNumber}</p>
+          <p>
+            <strong>Missed Raids:</strong> {absence}
+          </p>
+          <p>
+            <strong>Total loot recieved:</strong> {lootNumber}
+          </p>
         </div>
         <div>
-          <p>Attendance: {!isNaN(calcAttendance) ? calcAttendance : 0}%</p>
-          <p>No shows: {no_show}</p>
-          <p>Late: {late}</p>
-          <p>Passed Spot: {passed_spot}</p>
-          {six_months ? (
+          <p>
+            <strong>Attendance:</strong>{" "}
+            {!isNaN(calcAttendance) ? calcAttendance : 0}%
+          </p>
+          <p>
+            <strong>No shows:</strong> {no_show}
+          </p>
+          <p>
+            <strong>Late:</strong> {late}
+          </p>
+          <p>
+            <strong>Passed Spot:</strong> {passed_spot}
+          </p>
+          {six_months === "1" ? (
             <p>
               6 months<sup>+</sup> member
             </p>

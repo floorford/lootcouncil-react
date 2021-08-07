@@ -10,7 +10,7 @@ import Add from "./Add";
 
 const App = (): JSX.Element => {
   return (
-    <Router>
+    <Router basename="lootcouncil-react">
       <NavBar />
       <Switch>
         <Route exact path="/">

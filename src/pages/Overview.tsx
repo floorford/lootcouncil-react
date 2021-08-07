@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import lcStore from "../store/lc";
 import { IState, Member } from "../types";
@@ -11,21 +11,20 @@ const Overview = (): JSX.Element => {
     storedState ? JSON.parse(storedState) : lcStore.initialState
   );
 
-  useLayoutEffect(() => {
-    const storedState = sessionStorage.getItem("state");
+  useEffect(() => {
     setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
-  }, [setDataState]);
+  }, [setDataState, storedState]);
 
   useEffect(() => {
-    lcStore.init();
     const sub = lcStore.subscribe(setDataState);
+    lcStore.init();
     if (!members.length) {
       axios
         .all([
-          axiosAPI.get(""),
-          axiosAPI.get("/tabs/roles"),
-          axiosAPI.get("/tabs/ranks"),
-          axiosAPI.get("/tabs/classes"),
+          axiosAPI.get("/members"),
+          axiosAPI.get("/roles"),
+          axiosAPI.get("/ranks"),
+          axiosAPI.get("/classes"),
         ])
         .then(
           axios.spread((members, roles, ranks, classes) => {

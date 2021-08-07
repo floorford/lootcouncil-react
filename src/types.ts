@@ -6,7 +6,7 @@ export type Member = {
   role: string;
   prev_raids: string;
   absence: string;
-  six_months: boolean;
+  six_months: string;
   [key: string]: any;
 };
 
@@ -18,7 +18,7 @@ export type MemberData = {
   role_id: string;
   prev_raids: string;
   absence: string;
-  six_months: boolean;
+  six_months: string;
   [key: string]: any;
 };
 
@@ -67,7 +67,6 @@ export type IState = {
   selectedMember: Member;
   loading: boolean;
   error: string;
-  lcPlayers: Member[];
   items: Item[];
   [key: string]: any;
 };
@@ -104,9 +103,11 @@ export type StatsProps = {
 
 export type LootTableProps = {
   items: Array<Item>;
-  playerClass: string;
-  maxHeight: number;
+  playerClass?: string;
+  maxHeight?: number;
   raids: Raid[];
+  forOverview?: boolean;
+  members?: Member[];
 };
 
 export type Loot = {

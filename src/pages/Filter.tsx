@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import axiosAPI from "../axios";
@@ -13,10 +13,10 @@ import Select from "react-select";
 
 const Filter = () => {
   const location = useLocation().pathname.slice(1);
-  const [selectedFilter, setFilter] = useState<string | undefined>("");
+  const [selectedFilter, setFilter] = useState<string | null>(null);
 
   useEffect(() => {
-    setFilter("");
+    setFilter(null);
   }, [location]);
 
   const storedState = sessionStorage.getItem("state");
@@ -24,20 +24,20 @@ const Filter = () => {
     storedState ? JSON.parse(storedState) : lcStore.initialState
   );
 
-  useLayoutEffect(() => {
-    const storedState = sessionStorage.getItem("state");
+  useEffect(() => {
     setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
-  }, [setDataState]);
+  }, [setDataState, storedState]);
 
   useEffect(() => {
     const sub = lcStore.subscribe(setDataState);
+    lcStore.init();
     if (!data.members.length) {
       axios
         .all([
-          axiosAPI.get(""),
-          axiosAPI.get("/tabs/roles"),
-          axiosAPI.get("/tabs/ranks"),
-          axiosAPI.get("/tabs/classes"),
+          axiosAPI.get("/members"),
+          axiosAPI.get("/roles"),
+          axiosAPI.get("/ranks"),
+          axiosAPI.get("/classes"),
         ])
         .then(
           axios.spread((members, roles, ranks, classes) => {
@@ -87,10 +87,12 @@ const Filter = () => {
         <div className="flex search">
           <Select
             className="pink select"
-            value={filter.find(
-              (filter: { value: string | undefined }) =>
-                filter.value === selectedFilter
-            )}
+            value={
+              filter.find(
+                (filter: { value: string | undefined }) =>
+                  filter.value === selectedFilter
+              ) || []
+            }
             options={filter}
             isClearable
             isSearchable

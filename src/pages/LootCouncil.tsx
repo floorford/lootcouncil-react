@@ -12,9 +12,11 @@ import Stats from "../components/Stats";
 
 const LootCouncil = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<MemberLabel | null>();
+  const [lcPlayers, setLCPlayer] = useState<MemberLabel[]>([]);
+
   const storedState = sessionStorage.getItem("state");
   const [
-    { members, lcPlayers, loading, error, raids, items, attendance, events },
+    { members, loading, error, raids, items, attendance, events },
     setDataState,
   ] = useState<IState>(
     storedState ? JSON.parse(storedState) : lcStore.initialState
@@ -25,9 +27,8 @@ const LootCouncil = () => {
   });
 
   useLayoutEffect(() => {
-    const storedState = sessionStorage.getItem("state");
     setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
-  }, [setDataState]);
+  }, [setDataState, storedState]);
 
   useEffect(() => {
     const sub = lcStore.subscribe(setDataState);
@@ -35,9 +36,9 @@ const LootCouncil = () => {
       axios
         .all([
           axiosAPI.get(""),
-          axiosAPI.get("/tabs/roles"),
-          axiosAPI.get("/tabs/ranks"),
-          axiosAPI.get("/tabs/classes"),
+          axiosAPI.get("/roles"),
+          axiosAPI.get("/ranks"),
+          axiosAPI.get("/classes"),
         ])
         .then(
           axios.spread((members, roles, ranks, classes) => {
@@ -63,7 +64,7 @@ const LootCouncil = () => {
 
     if (!raids.length)
       axios
-        .all([axiosAPI.get(`/tabs/raids`)])
+        .all([axiosAPI.get(`/raids`)])
         .then(
           axios.spread((raids) => {
             lcStore.setRaids(raids.data);
@@ -81,7 +82,7 @@ const LootCouncil = () => {
 
     if (!items.length)
       axios
-        .all([axiosAPI.get(`/tabs/items`)])
+        .all([axiosAPI.get(`/items`)])
         .then(
           axios.spread((items) => {
             lcStore.setItems(items.data);
@@ -100,7 +101,7 @@ const LootCouncil = () => {
 
     if (!events.length)
       axios
-        .all([axiosAPI.get(`/tabs/events`), axiosAPI.get(`/tabs/attendance`)])
+        .all([axiosAPI.get(`/events`), axiosAPI.get(`/attendance`)])
         .then(
           axios.spread((events, attendance) => {
             lcStore.setEvents(events.data, attendance.data);
@@ -121,19 +122,13 @@ const LootCouncil = () => {
     };
   }, [members, raids, items, events]);
 
-  useEffect(() => {
-    const newPlayers = JSON.parse(localStorage.getItem("lcPlayers") || "[]");
-    lcStore.setPlayers(newPlayers);
-  }, []);
-
   type MemberLabel = Member & { value: string; label: string };
   const addPlayer = (chosenPlayer: MemberLabel | null): void => {
     if (chosenPlayer) {
       const newPlayers = lcPlayers.concat(chosenPlayer);
-      lcStore.setPlayers(newPlayers);
-      localStorage.setItem("lcPlayers", JSON.stringify(newPlayers));
       lcStore.setLoading(false);
       setSelectedPlayer(null);
+      setLCPlayer(newPlayers);
     } else {
       lcStore.setError("No player could be found");
       lcStore.setLoading(false);
@@ -142,8 +137,7 @@ const LootCouncil = () => {
 
   const deletePlayer = (player: Member) => {
     const newPlayers = lcPlayers.filter((x) => x.id !== player.id);
-    lcStore.setPlayers(newPlayers);
-    localStorage.setItem("lcPlayers", JSON.stringify(newPlayers));
+    setLCPlayer(newPlayers);
   };
 
   return (

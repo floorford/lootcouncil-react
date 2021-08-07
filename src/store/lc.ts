@@ -32,10 +32,9 @@ const initialState: IState = {
     role: "",
     prev_raids: "",
     absence: "",
-    six_months: false,
+    six_months: "0",
   },
   loading: false,
-  lcPlayers: [],
   error: "",
 };
 
@@ -54,7 +53,6 @@ const lcStore = {
       const { class_id, role_id, rank_id, ...memberData } = val;
       const formattedData: Member = {
         ...memberData,
-        six_months: memberData.six_months,
         class: data.classes.find((cl) => cl.id === class_id)!.title,
         role: data.roles.find((r) => r.id === role_id)!.title,
         rank: data.ranks.find((ra) => ra.id === rank_id)!.title,
@@ -72,14 +70,6 @@ const lcStore = {
       classes: data.classes,
     };
 
-    sessionStorage.setItem("state", JSON.stringify(state));
-    subject.next(state);
-  },
-  setPlayers: (newPlayers: any) => {
-    state = {
-      ...state,
-      lcPlayers: newPlayers,
-    };
     sessionStorage.setItem("state", JSON.stringify(state));
     subject.next(state);
   },

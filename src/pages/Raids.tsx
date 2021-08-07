@@ -1,15 +1,14 @@
 import { useEffect, useLayoutEffect, useState } from "react";
-import { useLocation, Link, useHistory } from "react-router-dom";
-import { IState, Item, Member } from "../types";
+import { useLocation } from "react-router-dom";
+import { IState, Item } from "../types";
 import lcStore from "../store/lc";
 import axios from "axios";
 import axiosAPI from "../axios";
 import Select from "react-select";
+import LootTable from "../components/LootTable";
 
 const Raids = () => {
   const [relevantItems, setRelevantItems] = useState<Item[]>([]);
-
-  const history = useHistory();
 
   const location = useLocation();
   const [raidID, setFilter] = useState<string | undefined>(
@@ -17,7 +16,7 @@ const Raids = () => {
   );
 
   const storedState = sessionStorage.getItem("state");
-  const [{ members, items, raids }, setDataState] = useState<IState>(
+  const [{ items, raids, members }, setDataState] = useState<IState>(
     storedState ? JSON.parse(storedState) : lcStore.initialState
   );
 
@@ -32,7 +31,7 @@ const Raids = () => {
 
     if (!raids.length) {
       axios
-        .all([axiosAPI.get(`/tabs/raids`)])
+        .all([axiosAPI.get(`/raids`)])
         .then(
           axios.spread((raids) => {
             lcStore.setRaids(raids.data);
@@ -52,7 +51,7 @@ const Raids = () => {
 
     if (!items.length)
       axios
-        .all([axiosAPI.get(`/tabs/items`)])
+        .all([axiosAPI.get(`/items`)])
         .then(
           axios.spread((items) => {
             lcStore.setItems(items.data);
@@ -76,19 +75,17 @@ const Raids = () => {
 
   useEffect(() => {
     if (raidID) {
-      console.log(items, raidID);
       setRelevantItems(items.filter((item) => item.raid_id === raidID));
     }
   }, [raidID, items]);
 
   const raidOptions = raids.map((raid) => {
-    return { ...raid, value: raid.id, label: `${raid.title} (${raid.date})` };
+    return {
+      ...raid,
+      value: raid.id,
+      label: `${raid.title} (${new Date(raid.date).toLocaleDateString()})`,
+    };
   });
-
-  const selectMember = (member: Member) => {
-    lcStore.setMember(member);
-    history.push(`/members/id/${member.id}`);
-  };
 
   return (
     <main className="wrapper">
@@ -110,45 +107,19 @@ const Raids = () => {
       ) : null}
 
       {relevantItems.length ? (
-        <table>
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Member</th>
-            </tr>
-          </thead>
-          <tbody>
-            {relevantItems.map((item) => {
-              const member = members.find(
-                (member) => member.id === item.member_id
-              );
-              return (
-                <tr key={item.id}>
-                  <td>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`https://tbc.wowhead.com/item=${item.item_id}`}
-                    >
-                      {item.title}
-                    </a>
-                  </td>
-                  {member && (
-                    <td>
-                      <Link
-                        onClick={() => selectMember(member)}
-                        to={`/members/id/${member?.id}`}
-                      >
-                        {member?.member}
-                      </Link>
-                    </td>
-                  )}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <LootTable
+          items={relevantItems}
+          raids={raids}
+          forOverview={true}
+          members={members}
+        />
       ) : null}
+
+      {raidID && !relevantItems.length && (
+        <p className="pink">
+          This raid was before loot council, or is not currently loot councilled
+        </p>
+      )}
     </main>
   );
 };
