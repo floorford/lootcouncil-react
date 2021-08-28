@@ -1,23 +1,23 @@
 {
   "files": {
     "main.css": "/lootcouncil-react/static/css/main.fcce10b0.chunk.css",
-    "main.js": "/lootcouncil-react/static/js/main.879879de.chunk.js",
-    "main.js.map": "/lootcouncil-react/static/js/main.879879de.chunk.js.map",
+    "main.js": "/lootcouncil-react/static/js/main.5ce7305c.chunk.js",
+    "main.js.map": "/lootcouncil-react/static/js/main.5ce7305c.chunk.js.map",
     "runtime-main.js": "/lootcouncil-react/static/js/runtime-main.5248653d.js",
     "runtime-main.js.map": "/lootcouncil-react/static/js/runtime-main.5248653d.js.map",
-    "static/js/2.e9b5204c.chunk.js": "/lootcouncil-react/static/js/2.e9b5204c.chunk.js",
-    "static/js/2.e9b5204c.chunk.js.map": "/lootcouncil-react/static/js/2.e9b5204c.chunk.js.map",
+    "static/js/2.0bbb5df9.chunk.js": "/lootcouncil-react/static/js/2.0bbb5df9.chunk.js",
+    "static/js/2.0bbb5df9.chunk.js.map": "/lootcouncil-react/static/js/2.0bbb5df9.chunk.js.map",
     "static/js/3.71f4007f.chunk.js": "/lootcouncil-react/static/js/3.71f4007f.chunk.js",
     "static/js/3.71f4007f.chunk.js.map": "/lootcouncil-react/static/js/3.71f4007f.chunk.js.map",
     "index.html": "/lootcouncil-react/index.html",
     "static/css/main.fcce10b0.chunk.css.map": "/lootcouncil-react/static/css/main.fcce10b0.chunk.css.map",
-    "static/js/2.e9b5204c.chunk.js.LICENSE.txt": "/lootcouncil-react/static/js/2.e9b5204c.chunk.js.LICENSE.txt",
+    "static/js/2.0bbb5df9.chunk.js.LICENSE.txt": "/lootcouncil-react/static/js/2.0bbb5df9.chunk.js.LICENSE.txt",
     "static/media/mo_logo.41a78959.png": "/lootcouncil-react/static/media/mo_logo.41a78959.png"
   },
   "entrypoints": [
     "static/js/runtime-main.5248653d.js",
-    "static/js/2.e9b5204c.chunk.js",
+    "static/js/2.0bbb5df9.chunk.js",
     "static/css/main.fcce10b0.chunk.css",
-    "static/js/main.879879de.chunk.js"
+    "static/js/main.5ce7305c.chunk.js"
   ]
 }
