@@ -32,6 +32,8 @@ const Filter = () => {
     const sub = lcStore.subscribe(setDataState);
     lcStore.init();
     if (!data.members.length) {
+      lcStore.setLoading(true);
+
       axios
         .all([
           axiosAPI.get("/members"),
@@ -116,7 +118,6 @@ const Filter = () => {
       ) : null}
 
       {data.loading && <p className="pink">Loading...</p>}
-
       {data.error && <p className="pink">{data.error}</p>}
     </main>
   );

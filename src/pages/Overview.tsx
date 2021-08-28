@@ -19,6 +19,8 @@ const Overview = (): JSX.Element => {
     const sub = lcStore.subscribe(setDataState);
     lcStore.init();
     if (!members.length) {
+      lcStore.setLoading(true);
+
       axios
         .all([
           axiosAPI.get("/members"),

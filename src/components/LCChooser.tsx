@@ -87,16 +87,16 @@ const LCChooser = () => {
 
   const handleSetIndex = (member: Member) => {
     if (member.rank === "Officer")
-      setOfficerIndex(Math.floor(Math.random() * officers.length));
+      return setOfficerIndex(Math.floor(Math.random() * officers.length));
 
     if (member.role === "tank" || member.role === "melee")
-      setMeleeIndex(Math.floor(Math.random() * melee.length));
+      return setMeleeIndex(Math.floor(Math.random() * melee.length));
 
     if (member.role === "healer")
-      setHealerIndex(Math.floor(Math.random() * healers.length));
+      return setHealerIndex(Math.floor(Math.random() * healers.length));
 
     if (member.role === "ranged" || member.role === "caster")
-      setRangedIndex(Math.floor(Math.random() * ranged.length));
+      return setRangedIndex(Math.floor(Math.random() * ranged.length));
   };
 
   const team = lcCandidates.length

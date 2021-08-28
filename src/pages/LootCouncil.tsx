@@ -23,7 +23,9 @@ const LootCouncil = () => {
   );
 
   const memberOptions = members
-    .filter((member) => lcPlayers.find((lcP) => lcP.id !== member.id))
+    .filter((member) =>
+      lcPlayers.length ? lcPlayers.find((lcP) => lcP.id !== member.id) : true
+    )
     .map((member) => {
       return { ...member, value: member.id, label: member.member };
     });

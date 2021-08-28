@@ -1,7 +1,7 @@
 import { StatsProps } from "../types";
 
 const Stats = ({ member, raids, totalLoot, attendance }: StatsProps) => {
-  const { absence, six_months, count_from, lc_willing } = member;
+  const { absence, six_months, count_from } = member;
 
   const { no_show, late, passed_spot } = attendance.reduce(
     (acc, val) => {
@@ -26,9 +26,6 @@ const Stats = ({ member, raids, totalLoot, attendance }: StatsProps) => {
   const calcAttendance = Math.ceil(
     ((Number(totalRaids) - Number(absence)) / totalRaids) * 100
   );
-
-  console.log(Number(totalRaids) - Number(absence), totalRaids);
-  console.log(lc_willing);
 
   return (
     <section className={`player-info ${member.class}`}>

@@ -16,9 +16,10 @@ const Raids = () => {
   );
 
   const storedState = sessionStorage.getItem("state");
-  const [{ items, raids, members }, setDataState] = useState<IState>(
-    storedState ? JSON.parse(storedState) : lcStore.initialState
-  );
+  const [{ items, raids, members, loading, error }, setDataState] =
+    useState<IState>(
+      storedState ? JSON.parse(storedState) : lcStore.initialState
+    );
 
   useLayoutEffect(() => {
     const storedState = sessionStorage.getItem("state");
@@ -30,6 +31,8 @@ const Raids = () => {
     const sub = lcStore.subscribe(setDataState);
 
     if (!raids.length) {
+      lcStore.setLoading(true);
+
       axios
         .all([axiosAPI.get(`/raids`)])
         .then(
@@ -49,7 +52,9 @@ const Raids = () => {
         });
     }
 
-    if (!items.length)
+    if (!items.length) {
+      lcStore.setLoading(true);
+
       axios
         .all([axiosAPI.get(`/items`)])
         .then(
@@ -67,6 +72,7 @@ const Raids = () => {
           lcStore.setError(err);
           lcStore.setLoading(false);
         });
+    }
 
     return function cleanup() {
       sub.unsubscribe();
@@ -120,6 +126,9 @@ const Raids = () => {
           This raid was before loot council, or is not currently loot councilled
         </p>
       )}
+
+      {loading && <p className="pink">Loading...</p>}
+      {error && <p className="pink">{error}</p>}
     </main>
   );
 };
