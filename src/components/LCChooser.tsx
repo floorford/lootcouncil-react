@@ -124,31 +124,28 @@ const LCChooser = () => {
             {team.length ? (
               <>
                 <span className={`member druid`}>Chickun</span>
-                {team.map((member, i) => {
-                  //   const role = getRole(member);
-                  return (
-                    <span
-                      key={i}
+                {team.map((member, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                    className={`member ${member.class}`}
+                  >
+                    {member.member}
+                    <button
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
+                        cursor: "pointer",
+                        backgroundColor: "inherit",
+                        border: "none",
                       }}
-                      className={`member ${member.class}`}
+                      onClick={() => handleSetIndex(member)}
                     >
-                      {member.member}
-                      <button
-                        style={{
-                          cursor: "pointer",
-                          backgroundColor: "inherit",
-                          border: "none",
-                        }}
-                        onClick={() => handleSetIndex(member)}
-                      >
-                        <i className="fas fa-dice"></i>
-                      </button>
-                    </span>
-                  );
-                })}
+                      <i className="fas fa-dice"></i>
+                    </button>
+                  </span>
+                ))}
               </>
             ) : null}
           </div>
