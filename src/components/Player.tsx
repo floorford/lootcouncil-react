@@ -103,7 +103,7 @@ const Player = (): JSX.Element => {
       <section className="flex player-wrapper">
         <Stats
           member={selectedMember}
-          raidTotal={raids.length}
+          raids={raids}
           totalLoot={memberLoot}
           attendance={memberAttendance}
         />

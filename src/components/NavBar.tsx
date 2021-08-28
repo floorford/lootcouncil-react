@@ -20,9 +20,16 @@ const NavBar = () => (
           <Link to="/raids">Raids</Link>
         </div>
       </div>
-      <Link className="link" to="/loot-council">
-        Loot Council
-      </Link>
+      <div className="subnav">
+        <button className="subnavbtn">
+          <Link className="link" to="/loot-council">
+            Loot Council <i className="fa fa-caret-down"></i>
+          </Link>
+        </button>
+        <div className="subnav-content">
+          <Link to="/lc-generator">Loot council generator</Link>
+        </div>
+      </div>
     </div>
   </nav>
 );

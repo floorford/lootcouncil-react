@@ -22,9 +22,11 @@ const LootCouncil = () => {
     storedState ? JSON.parse(storedState) : lcStore.initialState
   );
 
-  const memberOptions = members.map((member) => {
-    return { ...member, value: member.id, label: member.member };
-  });
+  const memberOptions = members
+    .filter((member) => lcPlayers.find((lcP) => lcP.id !== member.id))
+    .map((member) => {
+      return { ...member, value: member.id, label: member.member };
+    });
 
   useLayoutEffect(() => {
     setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
@@ -135,8 +137,8 @@ const LootCouncil = () => {
     }
   };
 
-  const deletePlayer = (player: Member) => {
-    const newPlayers = lcPlayers.filter((x) => x.id !== player.id);
+  const deletePlayer = (index: number) => {
+    const newPlayers = lcPlayers.filter((_, i) => i !== index);
     setLCPlayer(newPlayers);
   };
 
@@ -178,7 +180,7 @@ const LootCouncil = () => {
                   <div className="float-right">
                     <i
                       className="fas fa-lg fa-times"
-                      onClick={() => deletePlayer(member)}
+                      onClick={() => deletePlayer(i)}
                     ></i>
                   </div>
                   <MemberCard member={member} interactive={true} propClass="" />
@@ -186,7 +188,7 @@ const LootCouncil = () => {
                   <div className="collapsible">
                     <Stats
                       member={member}
-                      raidTotal={raids.length}
+                      raids={raids}
                       totalLoot={memberLoot}
                       attendance={memberAttendance}
                     />

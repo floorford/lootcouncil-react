@@ -4,21 +4,10 @@ export type Member = {
   class: string;
   rank: string;
   role: string;
-  prev_raids: string;
+  lc_willing: string;
   absence: string;
   six_months: string;
-  [key: string]: any;
-};
-
-export type MemberData = {
-  id: string;
-  member: string;
-  class_id: string;
-  rank_id: string;
-  role_id: string;
-  prev_raids: string;
-  absence: string;
-  six_months: string;
+  count_from: string;
   [key: string]: any;
 };
 
@@ -72,7 +61,7 @@ export type IState = {
 };
 
 export type IData = {
-  members: Array<MemberData>;
+  members: Array<Member>;
   roles: Array<RoleRankClass>;
   ranks: Array<RoleRankClass>;
   classes: Array<RoleRankClass>;
@@ -96,7 +85,7 @@ export type MemberProps = {
 
 export type StatsProps = {
   member: Member;
-  raidTotal: number;
+  raids: Raid[];
   totalLoot: Array<Item>;
   attendance: MappedAttendance[];
 };

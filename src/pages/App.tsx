@@ -7,6 +7,7 @@ import Overview from "./Overview";
 import Filter from "./Filter";
 import LootCouncil from "./LootCouncil";
 import Add from "./Add";
+import LCChooser from "../components/LCChooser";
 
 const App = (): JSX.Element => {
   return (
@@ -33,6 +34,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route path="/loot-council">
           <LootCouncil />
+        </Route>
+        <Route path="/lc-generator">
+          <LCChooser />
         </Route>
         <Route path="/add">
           <Add />

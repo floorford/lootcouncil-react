@@ -1,7 +1,7 @@
 import { StatsProps } from "../types";
 
-const Stats = ({ member, raidTotal, totalLoot, attendance }: StatsProps) => {
-  const { absence, prev_raids, six_months } = member;
+const Stats = ({ member, raids, totalLoot, attendance }: StatsProps) => {
+  const { absence, six_months, count_from, lc_willing } = member;
 
   const { no_show, late, passed_spot } = attendance.reduce(
     (acc, val) => {
@@ -13,18 +13,38 @@ const Stats = ({ member, raidTotal, totalLoot, attendance }: StatsProps) => {
     },
     { no_show: 0, late: 0, passed_spot: 0 }
   );
+
+  const firstRaid = raids.find(
+    (raid) => new Date(raid.date) >= new Date(count_from)
+  );
+
+  const totalRaids = raids.filter(
+    (raid) => new Date(raid.date) >= new Date(count_from)
+  ).length;
+
   const lootNumber = totalLoot.length;
-  const calcAttendance = Math.ceil((Number(+prev_raids) / raidTotal) * 100);
+  const calcAttendance = Math.ceil(
+    ((Number(totalRaids) - Number(absence)) / totalRaids) * 100
+  );
+
+  console.log(Number(totalRaids) - Number(absence), totalRaids);
+  console.log(lc_willing);
+
   return (
     <section className={`player-info ${member.class}`}>
       <h3 className="pink">Player Stats</h3>
       <section className="flex" style={{ justifyContent: "space-between" }}>
         <div>
+          {firstRaid && (
+            <p>
+              <strong>First raid:</strong> {firstRaid.title}: {firstRaid.date}
+            </p>
+          )}
           <p>
             <strong>Missed Raids:</strong> {absence}
           </p>
           <p>
-            <strong>Total loot recieved:</strong> {lootNumber}
+            <strong>Total loot:</strong> {lootNumber}
           </p>
         </div>
         <div>
@@ -32,15 +52,25 @@ const Stats = ({ member, raidTotal, totalLoot, attendance }: StatsProps) => {
             <strong>Attendance:</strong>{" "}
             {!isNaN(calcAttendance) ? calcAttendance : 0}%
           </p>
-          <p>
-            <strong>No shows:</strong> {no_show}
-          </p>
-          <p>
-            <strong>Late:</strong> {late}
-          </p>
-          <p>
-            <strong>Passed Spot:</strong> {passed_spot}
-          </p>
+
+          {no_show ? (
+            <p>
+              <strong>No shows:</strong> {no_show}
+            </p>
+          ) : null}
+
+          {late ? (
+            <p>
+              <strong>Late:</strong> {late}
+            </p>
+          ) : null}
+
+          {passed_spot ? (
+            <p>
+              <strong>Passed Spot:</strong> {passed_spot}
+            </p>
+          ) : null}
+
           {six_months === "1" ? (
             <p>
               6 months<sup>+</sup> member

@@ -4,7 +4,6 @@ import {
   Member,
   IData,
   RoleRankClass,
-  MemberData,
   Item,
   Attendance,
   MappedAttendance,
@@ -30,9 +29,10 @@ const initialState: IState = {
     class: "",
     rank: "",
     role: "",
-    prev_raids: "",
+    lc_willing: "",
     absence: "",
     six_months: "0",
+    count_from: "",
   },
   loading: false,
   error: "",
@@ -49,7 +49,7 @@ const lcStore = {
   subscribe: (setState: any) => subject.subscribe(setState),
   setData: (data: IData) => {
     // @ts-ignore
-    const members = data.members.reduce((acc: Member[], val: MemberData) => {
+    const members = data.members.reduce((acc: Member[], val: Member) => {
       const { class_id, role_id, rank_id, ...memberData } = val;
       const formattedData: Member = {
         ...memberData,
