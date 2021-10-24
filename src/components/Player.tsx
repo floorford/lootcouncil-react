@@ -60,29 +60,24 @@ const Player = (): JSX.Element => {
           lcStore.setLoading(false);
         });
 
-    if (!items.length)
+    if (!items.filter((item) => item.member_id === selectedMember.id).length) {
       axios
-        .all([axiosAPI.get(`/items`)])
+        .all([
+          axiosAPI.get(`/items`),
+          axiosAPI.get(`/${selectedMember.member}`),
+        ])
         .then(
-          axios.spread((items) => {
-            lcStore.setItems(items.data);
-
+          axios.spread((items, memberItems) => {
+            lcStore.setItems([...items.data, ...memberItems.data]);
             lcStore.setLoading(false);
           })
-        )
-        .catch((ex) => {
-          const err =
-            ex.response.status === 404
-              ? "Resource not found"
-              : "An unexpected error has occurred";
-          lcStore.setError(err);
-          lcStore.setLoading(false);
-        });
+        );
+    }
 
     return function cleanup() {
       sub.unsubscribe();
     };
-  }, [events, items, raids]);
+  }, [events, items, raids, selectedMember.id, selectedMember.member]);
 
   const memberLoot = items.filter(
     (item) => item.member_id === selectedMember.id

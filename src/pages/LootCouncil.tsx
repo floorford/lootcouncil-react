@@ -84,25 +84,6 @@ const LootCouncil = () => {
           lcStore.setLoading(false);
         });
 
-    if (!items.length)
-      axios
-        .all([axiosAPI.get(`/items`)])
-        .then(
-          axios.spread((items) => {
-            lcStore.setItems(items.data);
-
-            lcStore.setLoading(false);
-          })
-        )
-        .catch((ex) => {
-          const err =
-            ex.response.status === 404
-              ? "Resource not found"
-              : "An unexpected error has occurred";
-          lcStore.setError(err);
-          lcStore.setLoading(false);
-        });
-
     if (!events.length)
       axios
         .all([axiosAPI.get(`/events`), axiosAPI.get(`/attendance`)])
@@ -124,7 +105,7 @@ const LootCouncil = () => {
     return function cleanup() {
       sub.unsubscribe();
     };
-  }, [members, raids, items, events]);
+  }, [members, raids, events]);
 
   type MemberLabel = Member & { value: string; label: string };
   const addPlayer = (chosenPlayer: MemberLabel | null): void => {
@@ -133,9 +114,21 @@ const LootCouncil = () => {
       lcStore.setLoading(false);
       setSelectedPlayer(null);
       setLCPlayer(newPlayers);
-    } else {
-      lcStore.setError("No player could be found");
-      lcStore.setLoading(false);
+
+      if (!items.filter((item) => item.member_id === chosenPlayer.id).length) {
+        axios
+          .all([
+            axiosAPI.get(`/items`),
+            axiosAPI.get(`/${chosenPlayer.member}`),
+          ])
+          .then(
+            axios.spread((items, memberItems) => {
+              console.log([...items.data, ...memberItems.data]);
+              lcStore.setItems([...items.data, ...memberItems.data]);
+              lcStore.setLoading(false);
+            })
+          );
+      }
     }
   };
 
