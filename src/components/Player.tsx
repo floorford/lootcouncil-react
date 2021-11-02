@@ -61,17 +61,12 @@ const Player = (): JSX.Element => {
         });
 
     if (!items.filter((item) => item.member_id === selectedMember.id).length) {
-      axios
-        .all([
-          axiosAPI.get(`/items`),
-          axiosAPI.get(`/${selectedMember.member}`),
-        ])
-        .then(
-          axios.spread((items, memberItems) => {
-            lcStore.setItems([...items.data, ...memberItems.data]);
-            lcStore.setLoading(false);
-          })
-        );
+      axios.all([axiosAPI.get(`/${selectedMember.member}`)]).then(
+        axios.spread((memberItems) => {
+          lcStore.setItems([...items, ...memberItems.data]);
+          lcStore.setLoading(false);
+        })
+      );
     }
 
     return function cleanup() {

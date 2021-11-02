@@ -116,18 +116,12 @@ const LootCouncil = () => {
       setLCPlayer(newPlayers);
 
       if (!items.filter((item) => item.member_id === chosenPlayer.id).length) {
-        axios
-          .all([
-            axiosAPI.get(`/items`),
-            axiosAPI.get(`/${chosenPlayer.member}`),
-          ])
-          .then(
-            axios.spread((items, memberItems) => {
-              console.log([...items.data, ...memberItems.data]);
-              lcStore.setItems([...items.data, ...memberItems.data]);
-              lcStore.setLoading(false);
-            })
-          );
+        axios.all([axiosAPI.get(`/${chosenPlayer.member}`)]).then(
+          axios.spread((memberItems) => {
+            lcStore.setItems([...items, ...memberItems.data]);
+            lcStore.setLoading(false);
+          })
+        );
       }
     }
   };
@@ -167,6 +161,7 @@ const LootCouncil = () => {
               const memberLoot = items.filter(
                 (item) => item.member_id === member.id
               );
+
               const memberAttendance = attendance.filter(
                 (att) => att.member_id === member.id
               );
