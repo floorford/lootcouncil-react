@@ -20,6 +20,7 @@ export type Raid = {
   id: string;
   title: string;
   date: string;
+  log: string | null;
 };
 
 export type Item = {

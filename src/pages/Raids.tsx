@@ -1,25 +1,15 @@
 import { useEffect, useLayoutEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { IState, Item } from "../types";
+import { IState } from "../types";
 import lcStore from "../store/lc";
 import axios from "axios";
 import axiosAPI from "../axios";
 import Select from "react-select";
-import LootTable from "../components/LootTable";
 
 const Raids = () => {
-  const [relevantItems, setRelevantItems] = useState<Item[]>([]);
-
-  const location = useLocation();
-  const [raidID, setFilter] = useState<string | undefined>(
-    location.pathname.replace(/[^0-9]+/, "")
-  );
-
   const storedState = sessionStorage.getItem("state");
-  const [{ items, raids, members, loading, error }, setDataState] =
-    useState<IState>(
-      storedState ? JSON.parse(storedState) : lcStore.initialState
-    );
+  const [{ raids, loading, error }, setDataState] = useState<IState>(
+    storedState ? JSON.parse(storedState) : lcStore.initialState
+  );
 
   useLayoutEffect(() => {
     const storedState = sessionStorage.getItem("state");
@@ -52,52 +42,30 @@ const Raids = () => {
         });
     }
 
-    if (!items.length) {
-      lcStore.setLoading(true);
-
-      axios
-        .all([axiosAPI.get(`/items`)])
-        .then(
-          axios.spread((items) => {
-            lcStore.setItems(items.data);
-
-            lcStore.setLoading(false);
-          })
-        )
-        .catch((ex) => {
-          const err =
-            ex.response.status === 404
-              ? "Resource not found"
-              : "An unexpected error has occurred";
-          lcStore.setError(err);
-          lcStore.setLoading(false);
-        });
-    }
-
     return function cleanup() {
       sub.unsubscribe();
     };
-  }, [raids, items]);
-
-  useEffect(() => {
-    if (raidID) {
-      setRelevantItems(items.filter((item) => item.raid_id === raidID));
-    }
-  }, [raidID, items]);
+  }, [raids]);
 
   const raidOptions = raids.map((raid) => {
     return {
       ...raid,
       value: raid.id,
       label: `${raid.title} (${new Date(raid.date).toLocaleDateString()})`,
+      isDisabled: !raid.log,
     };
   });
 
   return (
     <main className="wrapper">
       <header>
-        <h1 className="pink">Raid Overview</h1>
+        <h1 className="pink">Raid Logs</h1>
       </header>
+
+      <p className="pink">
+        Select a raid below to see the logs. If it is greyed out no logs are
+        available.
+      </p>
 
       {raids.length ? (
         <div className="flex search">
@@ -106,26 +74,14 @@ const Raids = () => {
             options={raidOptions}
             isClearable
             isSearchable
+            isOptionDisabled={(option) => option.isDisabled}
             placeholder="Enter or select a raid..."
-            onChange={(selectedRaid) => setFilter(selectedRaid?.id)}
+            onChange={(selectedRaid) =>
+              selectedRaid?.log ? window.open(selectedRaid.log, "_blank") : null
+            }
           />
         </div>
       ) : null}
-
-      {relevantItems.length ? (
-        <LootTable
-          items={relevantItems}
-          raids={raids}
-          forOverview={true}
-          members={members}
-        />
-      ) : null}
-
-      {raidID && !relevantItems.length && (
-        <p className="pink">
-          This raid was before loot council, or is not currently loot councilled
-        </p>
-      )}
 
       {loading && <p className="pink">Loading...</p>}
       {error && <p className="pink">{error}</p>}
