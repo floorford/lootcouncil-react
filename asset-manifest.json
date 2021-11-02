@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/lootcouncil-react/static/css/main.fcce10b0.chunk.css",
-    "main.js": "/lootcouncil-react/static/js/main.cfda1033.chunk.js",
-    "main.js.map": "/lootcouncil-react/static/js/main.cfda1033.chunk.js.map",
+    "main.css": "/lootcouncil-react/static/css/main.a19308b1.chunk.css",
+    "main.js": "/lootcouncil-react/static/js/main.9bbc1d06.chunk.js",
+    "main.js.map": "/lootcouncil-react/static/js/main.9bbc1d06.chunk.js.map",
     "runtime-main.js": "/lootcouncil-react/static/js/runtime-main.327de50f.js",
     "runtime-main.js.map": "/lootcouncil-react/static/js/runtime-main.327de50f.js.map",
-    "static/js/2.96038380.chunk.js": "/lootcouncil-react/static/js/2.96038380.chunk.js",
-    "static/js/2.96038380.chunk.js.map": "/lootcouncil-react/static/js/2.96038380.chunk.js.map",
+    "static/js/2.8583e26d.chunk.js": "/lootcouncil-react/static/js/2.8583e26d.chunk.js",
+    "static/js/2.8583e26d.chunk.js.map": "/lootcouncil-react/static/js/2.8583e26d.chunk.js.map",
     "static/js/3.b0e8739a.chunk.js": "/lootcouncil-react/static/js/3.b0e8739a.chunk.js",
     "static/js/3.b0e8739a.chunk.js.map": "/lootcouncil-react/static/js/3.b0e8739a.chunk.js.map",
     "index.html": "/lootcouncil-react/index.html",
-    "static/css/main.fcce10b0.chunk.css.map": "/lootcouncil-react/static/css/main.fcce10b0.chunk.css.map",
-    "static/js/2.96038380.chunk.js.LICENSE.txt": "/lootcouncil-react/static/js/2.96038380.chunk.js.LICENSE.txt",
+    "static/css/main.a19308b1.chunk.css.map": "/lootcouncil-react/static/css/main.a19308b1.chunk.css.map",
+    "static/js/2.8583e26d.chunk.js.LICENSE.txt": "/lootcouncil-react/static/js/2.8583e26d.chunk.js.LICENSE.txt",
     "static/media/mo_logo.41a78959.png": "/lootcouncil-react/static/media/mo_logo.41a78959.png"
   },
   "entrypoints": [
     "static/js/runtime-main.327de50f.js",
-    "static/js/2.96038380.chunk.js",
-    "static/css/main.fcce10b0.chunk.css",
-    "static/js/main.cfda1033.chunk.js"
+    "static/js/2.8583e26d.chunk.js",
+    "static/css/main.a19308b1.chunk.css",
+    "static/js/main.9bbc1d06.chunk.js"
   ]
 }
