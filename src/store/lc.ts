@@ -33,6 +33,7 @@ const initialState: IState = {
     absence: "",
     six_months: "0",
     count_from: "",
+    active_raider: "0",
   },
   loading: false,
   error: "",

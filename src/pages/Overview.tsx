@@ -4,12 +4,16 @@ import lcStore from "../store/lc";
 import { IState, Member } from "../types";
 import MemberCard from "../components/Member";
 import axiosAPI from "../axios";
+import "../css/checkbox.css";
+import Checkbox from "../components/Checkbox";
 
 const Overview = (): JSX.Element => {
   const storedState = sessionStorage.getItem("state");
   const [{ error, loading, members }, setDataState] = useState<IState>(
     storedState ? JSON.parse(storedState) : lcStore.initialState
   );
+
+  const [isActiveRaiders, toggleIsActiveRaiders] = useState(false);
 
   useEffect(() => {
     setDataState(storedState ? JSON.parse(storedState) : lcStore.initialState);
@@ -55,23 +59,65 @@ const Overview = (): JSX.Element => {
     };
   }, [members.length]);
 
-  const tanks = members.filter((mem) => mem.role === "tank");
-  const healers = members.filter((mem) => mem.role === "healer");
-  const dps = members
-    .filter((mem) => mem.role !== "healer" && mem.role !== "tank")
-    .sort(function (a, b) {
-      if (a.class < b.class) {
-        return 1;
-      }
-      if (a.class > b.class) {
-        return -1;
-      }
+  const classSorter = (a: Member, b: Member) => {
+    if (a.className < b.className) {
+      return 1;
+    }
+    if (a.className > b.className) {
+      return -1;
+    }
+    return 0;
+  };
 
-      return 0;
-    });
+  const tanks = members
+    .filter((mem) => mem.role === "tank")
+    .filter((member) => {
+      if (isActiveRaiders) return member.active_raider === "1";
+      return true;
+    })
+    .sort(classSorter);
+
+  const healers = members
+    .filter((mem) => mem.role === "healer")
+    .filter((member) => {
+      if (isActiveRaiders) return member.active_raider === "1";
+      return true;
+    })
+    .sort(classSorter);
+
+  const melee = members
+    .filter((mem) => mem.role === "melee")
+    .filter((member) => {
+      if (isActiveRaiders) return member.active_raider === "1";
+      return true;
+    })
+    .sort(classSorter);
+
+  const ranged = members
+    .filter((mem) => mem.role === "ranged")
+    .filter((member) => {
+      if (isActiveRaiders) return member.active_raider === "1";
+      return true;
+    })
+    .sort(classSorter);
+
+  const caster = members
+    .filter((mem) => mem.role === "caster")
+    .filter((member) => {
+      if (isActiveRaiders) return member.active_raider === "1";
+      return true;
+    })
+    .sort(classSorter);
 
   return (
     <main className="wrapper">
+      <div>
+        <Checkbox
+          label="Active Raiders"
+          handleToggle={() => toggleIsActiveRaiders(!isActiveRaiders)}
+          isChecked={isActiveRaiders}
+        />
+      </div>
       {tanks.length ? (
         <section>
           <p className="team-role">
@@ -79,7 +125,7 @@ const Overview = (): JSX.Element => {
             TANKS ({tanks.length})
           </p>
           <div className="flex">
-            {tanks.map((member: Member) => (
+            {tanks.map((member) => (
               <MemberCard
                 key={member.id}
                 member={member}
@@ -108,13 +154,50 @@ const Overview = (): JSX.Element => {
           </div>
         </section>
       ) : null}
-      {dps.length ? (
+      {melee.length ? (
         <section>
           <p className="team-role">
-            <i className="fas fa-skull-crossbones"></i> DPS ({dps.length})
+            <i className="fas fa-skull-crossbones"></i> Melee DPS (
+            {melee.length})
           </p>
           <div className="flex">
-            {dps.map((member: Member) => (
+            {melee.map((member: Member) => (
+              <MemberCard
+                key={member.id}
+                member={member}
+                interactive={true}
+                propClass=""
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+      {ranged.length ? (
+        <section>
+          <p className="team-role">
+            <i className="fas fa-skull-crossbones"></i> Ranged DPS (
+            {ranged.length})
+          </p>
+          <div className="flex">
+            {ranged.map((member: Member) => (
+              <MemberCard
+                key={member.id}
+                member={member}
+                interactive={true}
+                propClass=""
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+      {caster.length ? (
+        <section>
+          <p className="team-role">
+            <i className="fas fa-skull-crossbones"></i> Casters ({caster.length}
+            )
+          </p>
+          <div className="flex">
+            {caster.map((member: Member) => (
               <MemberCard
                 key={member.id}
                 member={member}

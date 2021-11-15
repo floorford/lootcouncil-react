@@ -8,6 +8,7 @@ export type Member = {
   absence: string;
   six_months: string;
   count_from: string;
+  active_raider: string;
   [key: string]: any;
 };
 
