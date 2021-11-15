@@ -9,6 +9,7 @@ import LootTable from "../components/LootTable";
 import "../css/lootcouncil.css";
 import axiosAPI from "../axios";
 import Stats from "../components/Stats";
+import LootCouncilCard from "../components/LootCouncilCard";
 
 const LootCouncil = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<MemberLabel | null>();
@@ -166,30 +167,13 @@ const LootCouncil = () => {
                 (att) => att.member_id === member.id
               );
               return (
-                <section key={i} className={`lc ${member.class}`}>
-                  <div className="float-right">
-                    <i
-                      className="fas fa-lg fa-times"
-                      onClick={() => deletePlayer(i)}
-                    ></i>
-                  </div>
-                  <MemberCard member={member} interactive={true} propClass="" />
-
-                  <div className="collapsible">
-                    <Stats
-                      member={member}
-                      raids={raids}
-                      totalLoot={memberLoot}
-                      attendance={memberAttendance}
-                    />
-                    <LootTable
-                      items={memberLoot}
-                      maxHeight={350}
-                      playerClass={member.class}
-                      raids={raids}
-                    />
-                  </div>
-                </section>
+                <LootCouncilCard
+                  member={member}
+                  raids={raids}
+                  memberLoot={memberLoot}
+                  memberAttendance={memberAttendance}
+                  deletePlayer={() => deletePlayer(i)}
+                />
               );
             })
           : null}
