@@ -10,10 +10,13 @@ import MemberCard from "../components/Member";
 
 import "../css/filter.css";
 import Select from "react-select";
+import Checkbox from "../components/Checkbox";
 
 const Filter = () => {
   const location = useLocation().pathname.slice(1);
   const [selectedFilter, setFilter] = useState<string | null>(null);
+
+  const [isActiveRaiders, toggleIsActiveRaiders] = useState(false);
 
   useEffect(() => {
     setFilter(null);
@@ -71,9 +74,12 @@ const Filter = () => {
   const locationNameReady: string =
     location.slice(0, -1) === "classe" ? "class" : location.slice(0, -1);
 
-  const filteredMembers = data.members.filter(
-    (mem: Member) => mem[locationNameReady] === selectedFilter
-  );
+  const filteredMembers = data.members
+    .filter((mem: Member) => mem[locationNameReady] === selectedFilter)
+    .filter((member) => {
+      if (isActiveRaiders) return member.active_raider === "1";
+      return true;
+    });
 
   const filter = data[location].map((data: RoleRankClass) => {
     return { ...data, value: data.title, label: ucFirst(data.title) };
@@ -85,8 +91,16 @@ const Filter = () => {
         <h1 className="pink">{ucFirst(locationNameReady)} Overview</h1>
       </header>
 
+      <div>
+        <Checkbox
+          label="Active Raiders"
+          handleToggle={() => toggleIsActiveRaiders(!isActiveRaiders)}
+          isChecked={isActiveRaiders}
+        />
+      </div>
+
       {filter.length ? (
-        <div className="flex search">
+        <div className="flex search" style={{ marginTop: "1rem" }}>
           <Select
             className="pink select"
             value={
